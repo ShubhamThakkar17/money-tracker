@@ -46,7 +46,7 @@ function date(fd: FormData, key: string, required = false): string | null {
 
 function id(fd: FormData, key: string): string | null {
   const v = str(fd, key);
-  return /^[0-9a-f-]{32,36}$/i.test(v) ? v : null;
+  return /^[0-9a-f-]{8,36}$/i.test(v) ? v : null;
 }
 
 async function run(fn: () => Promise<string>): Promise<FormState> {

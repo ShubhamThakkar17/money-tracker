@@ -56,7 +56,8 @@ export function EditDialog({ id, label, title, action, children, wide }: {
         <form key={key} action={run} className="flex max-h-[85vh] flex-col gap-3 overflow-y-auto p-5 text-left">
           <input type="hidden" name="id" value={id} />
           <h2 className="text-base font-semibold">{title}</h2>
-          <div className="grid grid-cols-2 gap-3">{children}</div>
+          {/* Fields mount on first open: long lists (400+ rows) would otherwise ship one full form per row. */}
+          {key > 0 && <div className="grid grid-cols-2 gap-3">{children}</div>}
           <FormStatus state={state?.ok ? null : state} />
           <div className="flex justify-end gap-2">
             <Button type="button" variant="ghost" onClick={() => dialog.current?.close()}>Cancel</Button>

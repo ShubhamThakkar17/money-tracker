@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { deleteEntry, type DeletableKind, type FormState } from "@/app/actions";
 import { Button, inputClass } from "../ui";
 import { FormStatus } from "./form-status";
@@ -10,6 +10,7 @@ export function DeleteButton({ kind, id, label }: { kind: DeletableKind; id: str
   const dialog = useRef<HTMLDialogElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const [state, action, pending] = useActionState(deleteEntry, null as FormState);
+  const [opened, setOpened] = useState(false); // mount the form on first open; long lists would ship one per row
 
   useEffect(() => {
     if (state?.ok) dialog.current?.close();
@@ -19,7 +20,7 @@ export function DeleteButton({ kind, id, label }: { kind: DeletableKind; id: str
     <>
       <button
         type="button"
-        onClick={() => { form.current?.reset(); dialog.current?.showModal(); }}
+        onClick={() => { setOpened(true); form.current?.reset(); dialog.current?.showModal(); }}
         className="rounded p-1 text-muted hover:bg-critical/12 hover:text-critical-text"
         aria-label={`Delete ${label}`}
         title="Delete"
@@ -32,7 +33,7 @@ export function DeleteButton({ kind, id, label }: { kind: DeletableKind; id: str
         ref={dialog}
         className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-line bg-surface p-0 text-ink backdrop:bg-black/40"
       >
-        <form ref={form} action={action} className="flex flex-col gap-3 p-5 text-left">
+        {opened && <form ref={form} action={action} className="flex flex-col gap-3 p-5 text-left">
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="id" value={id} />
           <h2 className="text-base font-semibold">Delete “{label}”?</h2>
@@ -46,7 +47,7 @@ export function DeleteButton({ kind, id, label }: { kind: DeletableKind; id: str
             <Button type="button" variant="ghost" onClick={() => dialog.current?.close()}>Cancel</Button>
             <Button type="submit" variant="danger" disabled={pending}>{pending ? "Deleting…" : "Delete"}</Button>
           </div>
-        </form>
+        </form>}
       </dialog>
     </>
   );
