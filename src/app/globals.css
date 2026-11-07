@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+  --page: #f6f8f7;
+  --surface: #fdfefd;
+  --surface-2: #edf3f0;
+  --ink: #0c1210;
+  --ink-2: #4b5752;
+  --muted: #84908a;
+  --grid: #dce5e0;
+  --axis: #bccac3;
+  --border: rgba(12, 40, 28, 0.11);
+  --accent: #067050;
+  --accent-ink: #ffffff;
+
+  /* categorical series (validated reference palette) */
+  --series-1: #067050;
+  --series-2: #eb6834;
+  --trend-muted: #a6dbc4;
+
+  /* status (always paired with icon + label) */
+  --good: #0ca30c;
+  --good-text: #006300;
+  --warning: #fab219;
+  --critical: #d03b3b;
+  --critical-text: #b42f2f;
+}
+
+/* Dark palette: follows the system unless the user picked a theme (data-theme on <html>). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0a0f0d;
+    --surface: #131a17;
+    --surface-2: #1b2420;
+    --ink: #eef3f0;
+    --ink-2: #b8c4be;
+    --muted: #84908a;
+    --grid: #25302b;
+    --axis: #34413b;
+    --border: rgba(220, 255, 240, 0.09);
+    --accent: #34d399;
+    --accent-ink: #04130d;
+    --series-1: #22a575;
+    --series-2: #d95926;
+    --trend-muted: #1b4d3b;
+    --good-text: #0ca30c;
+    --critical-text: #e66767;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0a0f0d;
+  --surface: #131a17;
+  --surface-2: #1b2420;
+  --ink: #eef3f0;
+  --ink-2: #b8c4be;
+  --muted: #84908a;
+  --grid: #25302b;
+  --axis: #34413b;
+  --border: rgba(220, 255, 240, 0.09);
+  --accent: #34d399;
+  --accent-ink: #04130d;
+  --series-1: #22a575;
+  --series-2: #d95926;
+  --trend-muted: #1b4d3b;
+  --good-text: #0ca30c;
+  --critical-text: #e66767;
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-grid: var(--grid);
+  --color-line: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-good: var(--good);
+  --color-good-text: var(--good-text);
+  --color-warning: var(--warning);
+  --color-critical: var(--critical);
+  --color-critical-text: var(--critical-text);
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ---------- interaction polish ---------- */
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+::selection { background: color-mix(in oklab, var(--accent) 22%, transparent); }
+:where(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.toast-in { animation: toast-in 160ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
