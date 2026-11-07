@@ -1,8 +1,8 @@
 import "server-only";
 
-export { TIME_ZONE } from "./constants";
+export { TIME_ZONE, SCOPES, BUSINESSES } from "./constants";
+import { SCOPES } from "./constants";
 
-export const SCOPES = ["Personal", "Infinity Linkage"] as const;
 export const TX_TYPES = ["Expense", "Income"] as const;
 export const PAYMENT_METHODS = ["UPI", "Credit Card", "Debit Card", "Cash", "Bank Transfer"] as const;
 export const SUB_PAYMENT_METHODS = ["UPI", "Credit Card", "Debit Card", "Bank Transfer"] as const;
@@ -17,5 +17,6 @@ export type ScopeFilter = Scope | "all";
 
 export function parseScope(v: string | string[] | undefined): ScopeFilter {
   const s = Array.isArray(v) ? v[0] : v;
-  return s === "Personal" || s === "Infinity Linkage" ? s : "all";
+  if (s === "Personal") return s;
+  return s === "Work" || s === "Infinity Linkage" || s === "Corporate" ? "Work" : "all";
 }

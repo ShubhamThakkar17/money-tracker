@@ -11,7 +11,7 @@ import { IconLogout } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Finance Tracker",
-  description: "Personal + Infinity Linkage finances, backed by Google Sheets",
+  description: "Personal and work finances, backed by Google Sheets",
 };
 
 export const viewport: Viewport = {

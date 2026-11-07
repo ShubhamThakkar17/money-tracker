@@ -5,6 +5,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { addUpcomingPayment, markPaid, type FormState } from "@/app/actions";
 import { Button, Field, Input, Select } from "../ui";
 import { FormStatus } from "./form-status";
+import { ScopeFields } from "./scope-fields";
 import { formatINR } from "@/lib/format";
 import { toast } from "../toaster";
 
@@ -36,7 +37,7 @@ export function UpcomingForm({ today, categories, people }: { today: string; cat
       <Field label="Amount (₹)"><Input name="amount" inputMode="decimal" required placeholder="0" /></Field>
       <Field label="Due date"><Input type="date" name="dueDate" defaultValue={today} required /></Field>
       <Field label="Repeats"><Select name="repeat" options={["One-time", "Monthly", "Quarterly", "Yearly"]} /></Field>
-      <Field label="Scope"><Select name="scope" options={["Personal", "Infinity Linkage"]} /></Field>
+      <ScopeFields />
       <Field label="Category"><Select name="category" options={categories} placeholder="—" /></Field>
       <Field label="Method"><Select name="paymentMethod" options={["UPI", "Auto-debit", "Credit Card", "Debit Card", "Cash", "Bank Transfer"]} /></Field>
       <Field label={direction === "To pay" ? "Paying (optional)" : "From (optional)"} className={person === "__new" ? "" : "col-span-2"}>

@@ -42,7 +42,7 @@ export function DebtForm({ today, people }: { today: string; people: Opt[] }) {
         <Input name="amount" inputMode="decimal" required placeholder="0" />
       </Field>
       <Field label="Scope">
-        <Select name="scope" options={["Personal", "Infinity Linkage"]} />
+        <Select name="scope" options={["Personal", "Work"]} />
       </Field>
       <Field label="Date">
         <Input type="date" name="date" defaultValue={today} />

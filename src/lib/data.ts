@@ -1,7 +1,13 @@
 import "server-only";
 import { connection } from "next/server";
 import { type ScopeFilter } from "./config";
-import { read, rowsOf } from "./sheets";
+import { read, rowsOf, type Row } from "./sheets";
+import { normScope } from "./constants";
+
+const scopeOf = (r: Row) => normScope(read.select(r, "Scope"));
+/** Business a Work entry belongs to; old "Infinity Linkage"-scoped rows count as that business. */
+const businessOf = (r: Row) =>
+  read.text(r, "Business") || (read.select(r, "Scope") === "Infinity Linkage" ? "Infinity Linkage" : "");
 import { daysBetween, formatDate, formatINR, monthKey, shiftMonth, todayIST } from "./format";
 
 export type Transaction = {
@@ -16,6 +22,8 @@ export type Transaction = {
   subcategoryIds: string[];
   paymentMethod: string | null;
   paidToFrom: string;
+  /** Business a Work entry belongs to (e.g. Silver Touch); empty if not set. */
+  business: string;
   debtIds: string[];
   gst: number | null;
   notes: string;
@@ -70,6 +78,7 @@ export type Subscription = {
   cycle: string | null;
   nextRenewal: string | null;
   scope: string | null;
+  business: string;
   paymentMethod: string | null;
   active: boolean;
   monthlyCost: number;
@@ -87,6 +96,7 @@ export type UpcomingPayment = {
   repeat: string | null;
   status: string | null;
   scope: string | null;
+  business: string;
   categoryIds: string[];
   personIds: string[];
   paymentMethod: string | null;
@@ -127,11 +137,12 @@ export async function getTransactions(): Promise<Transaction[]> {
         date: read.date(r, "Date"),
         amount: read.number(r, "Amount") ?? 0,
         type: type === "Expense" || type === "Income" ? type : null,
-        scope: read.select(r, "Scope"),
+        scope: scopeOf(r),
         categoryIds,
         subcategoryIds: read.ids(r, "Subcategory"),
         paymentMethod: read.select(r, "Payment Method"),
         paidToFrom: read.text(r, "Paid To / From"),
+        business: businessOf(r),
         debtIds: read.ids(r, "Debt"),
         gst: read.number(r, "GST Paid"),
         notes: read.text(r, "Notes"),
@@ -164,7 +175,7 @@ export async function getCategories(): Promise<Category[]> {
       url: r.url,
       name: read.text(r, "Category"),
       icon: read.text(r, "Icon") ? [...read.text(r, "Icon")][0] : null,
-      scope: read.select(r, "Scope"),
+      scope: scopeOf(r),
       transfer: read.checkbox(r, "Transfer"),
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -183,7 +194,7 @@ async function getRawDebts() {
       amount: read.number(r, "Amount") ?? 0,
       date: read.date(r, "Date"),
       dueDate: read.date(r, "Due Date"),
-      scope: read.select(r, "Scope"),
+      scope: scopeOf(r),
       notes: read.text(r, "Notes"),
     } as const;
   });
@@ -217,7 +228,8 @@ export async function getSubscriptions(): Promise<Subscription[]> {
         amount,
         cycle,
         nextRenewal: read.date(pr, "Next Renewal"),
-        scope: read.select(pr, "Scope"),
+        scope: scopeOf(pr),
+        business: businessOf(pr),
         paymentMethod: read.select(pr, "Payment Method"),
         active: read.checkbox(pr, "Active"),
         monthlyCost,
@@ -240,7 +252,8 @@ export async function getUpcomingPayments(): Promise<UpcomingPayment[]> {
       direction: read.select(pr, "Direction") === "To receive" ? "To receive" : "To pay",
       repeat: read.select(pr, "Repeat"),
       status: read.select(pr, "Status"),
-      scope: read.select(pr, "Scope"),
+      scope: scopeOf(pr),
+      business: businessOf(pr),
       categoryIds: read.ids(pr, "Category"),
       personIds: read.ids(pr, "Person"),
       paymentMethod: read.select(pr, "Payment Method"),
@@ -463,7 +476,7 @@ export async function getDashboard(scope: ScopeFilter) {
       .reduce((s, x) => s + x.amount, 0);
   const toReceive = pending.filter((p) => p.direction === "To receive");
   const referralPayoutsPending =
-    scope === "Infinity Linkage" ? 0 : (await getReferralPayouts()).filter((x) => x.status !== "Paid").reduce((s, x) => s + x.amount, 0);
+    scope === "Work" ? 0 : (await getReferralPayouts()).filter((x) => x.status !== "Paid").reduce((s, x) => s + x.amount, 0);
   const referralUpcoming = toReceive.filter((p) => isReferral(p.categoryIds)).reduce((s, p) => s + p.remaining, 0);
   const referrals = referralUpcoming + referralPayoutsPending;
   const expected = toReceive.reduce((s, p) => s + p.remaining, 0) - referralUpcoming;
@@ -494,7 +507,11 @@ export async function getDashboard(scope: ScopeFilter) {
     monthly,
     categorySpend,
     openDebts: openDebts.slice(0, 6),
-    people: people.filter((p) => p.net !== 0).slice(0, 6),
+    // In a Personal or Work view, only list people with open debts in that scope.
+    people: people
+      .filter((p) => p.net !== 0)
+      .filter((p) => scope === "all" || openDebts.some((d) => d.personIds.includes(p.id)))
+      .slice(0, 6),
     peopleById: Object.fromEntries(people.map((p) => [p.id, p.name])),
     upcoming,
     dueOut,

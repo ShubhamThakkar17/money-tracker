@@ -5,7 +5,7 @@ import { cx } from "./ui";
 const options: { value: ScopeFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "Personal", label: "Personal" },
-  { value: "Infinity Linkage", label: "Infinity Linkage" },
+  { value: "Work", label: "Work" },
 ];
 
 export function ScopeTabs({ current, basePath }: { current: ScopeFilter; basePath: string }) {

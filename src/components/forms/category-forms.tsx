@@ -40,7 +40,7 @@ export function CategoryForm() {
     <form ref={ref} action={action} className="grid grid-cols-[4.5rem_1fr] gap-3">
       <Field label="Emoji"><Input name="icon" placeholder="🍿" maxLength={4} className="text-center" /></Field>
       <Field label="Category name"><Input name="name" required placeholder="e.g. Fitness" /></Field>
-      <Field label="Scope" className="col-span-2"><Select name="scope" options={["Both", "Personal", "Infinity Linkage"]} /></Field>
+      <Field label="Scope" className="col-span-2"><Select name="scope" options={["Both", "Personal", "Work"]} /></Field>
       <div className="col-span-2 flex flex-wrap items-center gap-3">
         <Button type="submit" variant="ghost" disabled={pending}>{pending ? "Saving…" : "Add category"}</Button>
         <FormStatus state={state} />

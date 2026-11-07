@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { BILLING_CYCLES, DIRECTIONS, PAYMENT_METHODS, RELATIONSHIPS, REPEATS, SCOPES, TIME_ZONE, TX_TYPES, UPCOMING_METHODS } from "@/lib/config";
+import { BILLING_CYCLES, BUSINESSES, DIRECTIONS, PAYMENT_METHODS, RELATIONSHIPS, REPEATS, SCOPES, TIME_ZONE, TX_TYPES, UPCOMING_METHODS } from "@/lib/config";
 import { addMonths, cycleMonths, todayIST } from "@/lib/format";
 import { findRow, insert, read, sameId, update, write, type TableKey } from "@/lib/sheets";
 import { requireSession } from "@/lib/auth";
@@ -16,6 +16,11 @@ export type FormState = { ok: boolean; message: string } | null;
 
 function str(fd: FormData, key: string): string {
   return String(fd.get(key) ?? "").trim();
+}
+
+/** Business tag is kept only for Work entries. */
+function businessFor(fd: FormData): string {
+  return oneOf(fd, "scope", SCOPES) === "Work" ? (oneOf(fd, "business", BUSINESSES) ?? "") : "";
 }
 
 function oneOf<T extends readonly string[]>(fd: FormData, key: string, allowed: T): T[number] | null {
@@ -112,6 +117,7 @@ export async function addTransaction(_: FormState, fd: FormData): Promise<FormSt
         Amount: write.number(value),
         Type: write.select(type),
         Scope: write.select(oneOf(fd, "scope", SCOPES)),
+        Business: write.text(businessFor(fd)),
         Category: write.relation(category ? [category] : []),
         Subcategory: write.relation(subcategory ? [subcategory] : []),
         "Payment Method": write.select(oneOf(fd, "paymentMethod", PAYMENT_METHODS)),
@@ -213,6 +219,7 @@ export async function addSubscription(_: FormState, fd: FormData): Promise<FormS
         "Billing Cycle": write.select(oneOf(fd, "cycle", BILLING_CYCLES)),
         "Next Renewal": write.date(date(fd, "nextRenewal")),
         Scope: write.select(oneOf(fd, "scope", SCOPES)),
+        Business: write.text(businessFor(fd)),
         Category: write.relation(category ? [category] : []),
         "Payment Method": write.select(str(fd, "paymentMethod") || null),
         Active: write.checkbox(true),
@@ -288,6 +295,7 @@ export async function addUpcomingPayment(_: FormState, fd: FormData): Promise<Fo
         Repeat: write.select(oneOf(fd, "repeat", REPEATS) ?? "One-time"),
         Status: write.select("Pending"),
         Scope: write.select(oneOf(fd, "scope", SCOPES)),
+        Business: write.text(businessFor(fd)),
         Category: write.relation(category ? [category] : []),
         Person: write.relation(person ? [person] : []),
         "Payment Method": write.select(oneOf(fd, "paymentMethod", UPCOMING_METHODS)),
@@ -381,7 +389,7 @@ export async function addCategory(_: FormState, fd: FormData): Promise<FormState
     await insert("categories", {
       Category: name,
       Icon: icon ? [...icon][0] : null,
-      Scope: ["Personal", "Infinity Linkage", "Both"].includes(str(fd, "scope")) ? str(fd, "scope") : "Both",
+      Scope: ["Personal", "Work", "Both"].includes(str(fd, "scope")) ? str(fd, "scope") : "Both",
       Transfer: false,
     });
     return `Added category “${name}”.`;
@@ -431,6 +439,7 @@ export async function updateTransaction(_: FormState, fd: FormData): Promise<For
         Amount: write.number(amount(fd, "amount")),
         Type: write.select(type),
         Scope: write.select(oneOf(fd, "scope", SCOPES)),
+        Business: write.text(businessFor(fd)),
         Category: write.relation(category ? [category] : []),
         Subcategory: write.relation(subcategory ? [subcategory] : []),
         "Payment Method": write.select(oneOf(fd, "paymentMethod", PAYMENT_METHODS)),
@@ -484,6 +493,7 @@ export async function updateUpcomingPayment(_: FormState, fd: FormData): Promise
         Repeat: write.select(oneOf(fd, "repeat", REPEATS) ?? "One-time"),
         Status: write.select(str(fd, "status") === "Paid" ? "Paid" : "Pending"),
         Scope: write.select(oneOf(fd, "scope", SCOPES)),
+        Business: write.text(businessFor(fd)),
         Category: write.relation(category ? [category] : []),
         Person: write.relation(person ? [person] : []),
         "Payment Method": write.select(oneOf(fd, "paymentMethod", UPCOMING_METHODS)),
@@ -508,6 +518,7 @@ export async function updateSubscription(_: FormState, fd: FormData): Promise<Fo
         "Billing Cycle": write.select(oneOf(fd, "cycle", BILLING_CYCLES)),
         "Next Renewal": write.date(date(fd, "nextRenewal")),
         Scope: write.select(oneOf(fd, "scope", SCOPES)),
+        Business: write.text(businessFor(fd)),
         Category: write.relation(category ? [category] : []),
         "Payment Method": write.select(str(fd, "paymentMethod") || null),
         Active: write.checkbox(str(fd, "active") === "on"),

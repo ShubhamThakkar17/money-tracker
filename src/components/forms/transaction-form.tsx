@@ -5,6 +5,7 @@ import { addTransaction, type FormState } from "@/app/actions";
 import Link from "next/link";
 import { Button, Field, Input, Select, inputClass } from "../ui";
 import { FormStatus } from "./form-status";
+import { ScopeFields } from "./scope-fields";
 
 type Opt = { value: string; label: string };
 export type SubOpt = { value: string; label: string; categoryId: string | null };
@@ -81,21 +82,19 @@ export function TransactionForm({ today, categories, subcategories, debts }: {
       <Field label="Category">
         <Select name="category" options={categories} placeholder="—" value={category} onChange={(e) => pickCat(e.target.value)} />
       </Field>
-      <Field label="Scope">
-        <Select name="scope" options={["Personal", "Infinity Linkage"]} value={scope} onChange={(e) => setScope(e.target.value)} />
-      </Field>
+      <ScopeFields scope={scope} onScopeChange={setScope} />
       <Field label="Payment method">
         <Select name="paymentMethod" options={PAYMENT_METHODS} defaultValue="UPI" />
       </Field>
       <Field label={type === "Expense" ? "Paid to" : "Received from"}>
         <Input name="paidToFrom" placeholder="Optional" />
       </Field>
-      {scope === "Infinity Linkage" && type === "Expense" && (
+      {scope === "Work" && type === "Expense" && (
         <Field label="GST paid (₹)">
           <Input name="gst" inputMode="decimal" placeholder="Optional" />
         </Field>
       )}
-      <Field label="Settles a debt?" className={scope === "Infinity Linkage" && type === "Expense" ? "" : "col-span-1"}>
+      <Field label="Settles a debt?" className={scope === "Work" && type === "Expense" ? "" : "col-span-1"}>
         <Select name="debt" options={debts} placeholder="No" />
       </Field>
       <Field label="Notes" className="col-span-2">

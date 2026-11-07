@@ -1,6 +1,6 @@
 # Finance Tracker
 
-A Next.js dashboard for Shubham's finances: personal and Infinity Linkage income, expenses, upcoming payments, subscriptions, and who owes whom. Built on Krutik Raut's [finance-tracker](https://github.com/krutikkkkkkkkk/finance-tracker), with Google Sheets in place of Notion.
+A Next.js dashboard for Shubham's finances: personal and work income, expenses, upcoming payments, subscriptions, and who owes whom. Every entry is Personal or Work; Work entries can carry a Business tag (Silver Touch, Keshav Consultancy, GrowwwPro, Infinity Linkage, Alendei, Other) and the Transactions page can filter by it. The list lives in `src/lib/constants.ts`. Built on Krutik Raut's [finance-tracker](https://github.com/krutikkkkkkkkk/finance-tracker), with Google Sheets in place of Notion.
 
 A Google Sheet is the database. Anything you add here is written to the sheet, and anything you edit in the sheet shows up here on the next page load.
 
@@ -8,10 +8,10 @@ A Google Sheet is the database. Anything you add here is written to the sheet, a
 
 | Page | What it does |
 |---|---|
-| **Dashboard** | Shows this month's income, expenses and net, plus what you're owed and what you owe. Also has a 6‑month income vs expenses chart, spending by category, people balances, renewals due in the next 30 days, and recent transactions. Filter by All / Personal / Infinity Linkage. |
+| **Dashboard** | Shows this month's income, expenses and net, plus what you're owed and what you owe. Also has a 6‑month income vs expenses chart, spending by category, people balances, renewals due in the next 30 days, and recent transactions. Filter by All / Personal / Work. |
 | **Upcoming** | Bills and payments with a due date: credit card bills, rent, EMIs, GST, and client payments you're expecting. Subscription renewals and debts with a due date show up here too. Items are grouped into Overdue, Next 7 days, Later this month and Further out. **Mark paid** logs a transaction for the item. A recurring item then moves to its next due date, and a one-time item is marked Paid. |
 | **Transactions** | Add an expense or income, optionally linked to a debt it settles. Filter by month and type. Click a row to open it in the sheet. |
-| **Analytics** | Spending by category, with each category broken down into its subcategories. Pick a period (this month, last month, last 3, 6 or 12 months, or this year) and the Personal / Infinity Linkage filter. Choose any category or subcategory, for example Rapido over the last 3 months, to see its total, the change from the previous period, the number of transactions, the average per transaction, a month-by-month chart and every transaction. |
+| **Analytics** | Spending by category, with each category broken down into its subcategories. Pick a period (this month, last month, last 3, 6 or 12 months, or this year) and the Personal / Work filter. Choose any category or subcategory, for example Rapido over the last 3 months, to see its total, the change from the previous period, the number of transactions, the average per transaction, a month-by-month chart and every transaction. |
 | **Categories** | Your categories, with their subcategories (e.g. Rapido and Uber under Transport, Zomato and Swiggy under Food & Dining) and this month's spend for each. You can add new categories or subcategories here. |
 | **Debts** | Balance per person, open debts with an Overdue / Partially paid / Open status, and **Record payment**, which logs a linked repayment transaction. You can also add a debt (creating a new person if needed) or add a person. |
 | **Subscriptions** | Monthly and yearly totals. **Mark renewed** moves the next renewal date forward by one billing cycle; you can also cancel or reactivate a subscription. |

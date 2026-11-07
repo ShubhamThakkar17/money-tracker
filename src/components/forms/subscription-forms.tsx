@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useTransition } from "react";
 import { addSubscription, markRenewed, setSubscriptionActive } from "@/app/actions";
 import { Button, Field, Input, Select } from "../ui";
 import { FormStatus } from "./form-status";
+import { ScopeFields } from "./scope-fields";
 
 type Opt = { value: string; label: string };
 
@@ -17,7 +18,7 @@ export function SubscriptionForm({ categories }: { categories: Opt[] }) {
       <Field label="Amount (₹)"><Input name="amount" inputMode="decimal" required /></Field>
       <Field label="Billing cycle"><Select name="cycle" options={["Monthly", "Quarterly", "Yearly"]} /></Field>
       <Field label="Next renewal"><Input type="date" name="nextRenewal" /></Field>
-      <Field label="Scope"><Select name="scope" options={["Infinity Linkage", "Personal"]} /></Field>
+      <ScopeFields />
       <Field label="Category"><Select name="category" options={categories} placeholder="—" /></Field>
       <Field label="Payment method"><Select name="paymentMethod" options={["Credit Card", "UPI", "Debit Card", "Bank Transfer"]} /></Field>
       <div className="col-span-2 flex flex-wrap items-center gap-3">

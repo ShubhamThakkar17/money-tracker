@@ -14,7 +14,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/">) {
   const scope = parseScope((await searchParams).scope);
   return (
     <>
-      <PageHeader title="Dashboard" subtitle="A snapshot of your finances across personal and Infinity Linkage">
+      <PageHeader title="Dashboard" subtitle="A snapshot of your personal and work finances">
         <div className="flex flex-wrap items-center gap-3">
           <ScopeTabs current={scope} basePath="/" />
           <AddEntryMenu />
@@ -120,7 +120,7 @@ function RecentTable({ rows }: { rows: Awaited<ReturnType<typeof getDashboard>>[
                 <span className="block text-xs text-muted sm:hidden">{t.categoryName ?? "Uncategorised"}</span>
               </td>
               <td className="hidden py-2.5 pr-3 text-ink-2 sm:table-cell">{t.categoryName ?? "—"}</td>
-              <td className="hidden py-2.5 pr-3 md:table-cell">{t.scope ? <Badge tone={t.scope === "Personal" ? "neutral" : "accent"}>{t.scope}</Badge> : "—"}</td>
+              <td className="hidden py-2.5 pr-3 md:table-cell">{t.scope ? <Badge tone={t.scope === "Personal" ? "neutral" : "accent"}>{t.business || t.scope}</Badge> : "—"}</td>
               <td className={cx("tabular px-4 py-2.5 text-right font-medium whitespace-nowrap sm:px-5", t.type === "Income" && "text-good-text")}>
                 {t.type === "Income" ? "+" : "−"}{formatINR(t.amount)}
               </td>

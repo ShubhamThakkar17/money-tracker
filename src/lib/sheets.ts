@@ -15,7 +15,7 @@ import { cache } from "react";
 export const TABLES = {
   transactions: {
     tab: "Transactions",
-    columns: ["ID", "Name", "Date", "Amount", "Type", "Scope", "Category", "Subcategory", "Payment Method", "Paid To / From", "Debt", "Upcoming Payment", "GST Paid", "Notes", "Source", "Deleted"],
+    columns: ["ID", "Name", "Date", "Amount", "Type", "Scope", "Business", "Category", "Subcategory", "Payment Method", "Paid To / From", "Debt", "Upcoming Payment", "GST Paid", "Notes", "Source", "Deleted"],
   },
   categories: { tab: "Categories", columns: ["ID", "Category", "Icon", "Scope", "Transfer", "Deleted"] },
   subcategories: { tab: "Subcategories", columns: ["ID", "Name", "Category", "Deleted"] },
@@ -26,11 +26,11 @@ export const TABLES = {
   people: { tab: "People", columns: ["ID", "Name", "Phone", "UPI ID", "Relationship", "Deleted"] },
   subscriptions: {
     tab: "Subscriptions",
-    columns: ["ID", "Name", "Amount", "Billing Cycle", "Next Renewal", "Scope", "Category", "Payment Method", "Active", "Notes", "Deleted"],
+    columns: ["ID", "Name", "Amount", "Billing Cycle", "Next Renewal", "Scope", "Business", "Category", "Payment Method", "Active", "Notes", "Deleted"],
   },
   upcoming: {
     tab: "Upcoming",
-    columns: ["ID", "Name", "Amount", "Due Date", "Direction", "Repeat", "Status", "Scope", "Category", "Person", "Payment Method", "Paid So Far", "Notes", "Deleted"],
+    columns: ["ID", "Name", "Amount", "Due Date", "Direction", "Repeat", "Status", "Scope", "Business", "Category", "Person", "Payment Method", "Paid So Far", "Notes", "Deleted"],
   },
   referralPrograms: {
     tab: "Referral Programs",

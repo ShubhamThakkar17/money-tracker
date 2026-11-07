@@ -17,7 +17,7 @@ export default async function SubscriptionsPage() {
   const active = subs.filter((s) => s.active);
   const inactive = subs.filter((s) => !s.active);
   const monthly = active.reduce((s, x) => s + x.monthlyCost, 0);
-  const business = active.filter((s) => s.scope === "Infinity Linkage").reduce((s, x) => s + x.monthlyCost, 0);
+  const business = active.filter((s) => s.scope === "Work").reduce((s, x) => s + x.monthlyCost, 0);
 
   return (
     <>
@@ -25,7 +25,7 @@ export default async function SubscriptionsPage() {
       <div className="mb-4 grid grid-cols-3 gap-3">
         <Stat label="Per month" value={formatINR(monthly)} />
         <Stat label="Per year" value={formatINR(monthly * 12)} />
-        <Stat label="Business share" value={formatINR(business) + "/mo"} />
+        <Stat label="Work share" value={formatINR(business) + "/mo"} />
       </div>
       <div className="grid gap-4 lg:grid-cols-5">
         <div className="flex min-w-0 flex-col gap-4 lg:col-span-3">
@@ -46,7 +46,7 @@ export default async function SubscriptionsPage() {
                               {days < 0 ? `${-days}d overdue` : days === 0 ? "Today" : `in ${days}d`}
                             </Badge>
                           )}
-                          {s.scope && <Badge tone={s.scope === "Personal" ? "neutral" : "accent"}>{s.scope}</Badge>}
+                          {s.scope && <Badge tone={s.scope === "Personal" ? "neutral" : "accent"}>{s.business || s.scope}</Badge>}
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
@@ -55,7 +55,6 @@ export default async function SubscriptionsPage() {
                         </p>
                         <div className="flex items-center gap-2">
                           <SubscriptionActions id={s.id} active nextRenewal={s.nextRenewal} cycle={s.cycle} />
-                          <EditSubscription s={s} categories={catOptions} />
                           <EditSubscription s={s} categories={catOptions} />
                       <DeleteButton kind="subscriptions" id={s.id} label={s.name} />
                         </div>

@@ -11,6 +11,7 @@ import {
 } from "@/app/actions";
 import { Button, Field, Input, Select, inputClass } from "../ui";
 import { FormStatus } from "./form-status";
+import { ScopeFields } from "./scope-fields";
 import { toast } from "../toaster";
 
 type Opt = { value: string; label: string };
@@ -69,14 +70,14 @@ export function EditDialog({ id, label, title, action, children, wide }: {
   );
 }
 
-const SCOPES = ["Personal", "Infinity Linkage"];
+const SCOPES = ["Personal", "Work"];
 
 // ---------- Transaction ----------
 
 export type EditableTransaction = {
   id: string; name: string; date: string | null; amount: number; type: "Expense" | "Income" | null;
   scope: string | null; categoryIds: string[]; subcategoryIds: string[]; paymentMethod: string | null;
-  paidToFrom: string; gst: number | null; notes: string;
+  paidToFrom: string; business: string; gst: number | null; notes: string;
 };
 
 export function EditTransaction({ t, categories, subcategories }: {
@@ -103,7 +104,7 @@ function TransactionFields({ t, categories, subcategories }: {
       <Field label="Type"><Select name="type" options={["Expense", "Income"]} defaultValue={t.type ?? "Expense"} /></Field>
       <Field label="Amount (₹)"><Input name="amount" inputMode="decimal" defaultValue={String(t.amount)} required /></Field>
       <Field label="Date"><Input type="date" name="date" defaultValue={t.date ?? ""} required /></Field>
-      <Field label="Scope"><Select name="scope" options={SCOPES} defaultValue={t.scope ?? "Personal"} /></Field>
+      <ScopeFields scope={t.scope} business={t.business} />
       <Field label="Subcategory">
         <select
           name="subcategory"
@@ -173,7 +174,7 @@ export function EditDebt({ d, people }: { d: EditableDebt; people: Opt[] }) {
 
 export type EditableUpcoming = {
   id: string; name: string; amount: number; dueDate: string | null; direction: "To pay" | "To receive";
-  repeat: string | null; status: string | null; scope: string | null; categoryIds: string[]; personIds: string[];
+  repeat: string | null; status: string | null; scope: string | null; business: string; categoryIds: string[]; personIds: string[];
   paymentMethod: string | null; notes: string; paidSoFar: number;
 };
 
@@ -187,7 +188,7 @@ export function EditUpcoming({ p, categories, people }: { p: EditableUpcoming; c
       <Field label="Due date"><Input type="date" name="dueDate" defaultValue={p.dueDate ?? ""} required /></Field>
       <Field label={p.direction === "To receive" ? "Received so far (₹)" : "Paid so far (₹)"}><Input name="paidSoFar" inputMode="decimal" defaultValue={p.paidSoFar ? String(p.paidSoFar) : ""} placeholder="0" /></Field>
       <Field label="Repeats"><Select name="repeat" options={["One-time", "Monthly", "Quarterly", "Yearly"]} defaultValue={p.repeat ?? "One-time"} /></Field>
-      <Field label="Scope"><Select name="scope" options={SCOPES} defaultValue={p.scope ?? "Personal"} /></Field>
+      <ScopeFields scope={p.scope} business={p.business} />
       <Field label="Category"><Select name="category" options={categories} placeholder="—" defaultValue={pick(categories, p.categoryIds[0])} /></Field>
       <Field label="Method"><Select name="paymentMethod" options={["UPI", "Auto-debit", "Credit Card", "Debit Card", "Cash", "Bank Transfer"]} placeholder="—" defaultValue={p.paymentMethod ?? ""} /></Field>
       <Field label="Person" className="col-span-2"><Select name="person" options={people} placeholder="— No one —" defaultValue={pick(people, p.personIds[0])} /></Field>
@@ -199,7 +200,7 @@ export function EditUpcoming({ p, categories, people }: { p: EditableUpcoming; c
 // ---------- Subscription ----------
 
 export type EditableSubscription = {
-  id: string; name: string; amount: number; cycle: string | null; nextRenewal: string | null; scope: string | null;
+  id: string; name: string; amount: number; cycle: string | null; nextRenewal: string | null; scope: string | null; business: string;
   paymentMethod: string | null; active: boolean; categoryIds: string[]; notes: string;
 };
 
@@ -210,7 +211,7 @@ export function EditSubscription({ s, categories }: { s: EditableSubscription; c
       <Field label="Amount (₹)"><Input name="amount" inputMode="decimal" defaultValue={String(s.amount)} required /></Field>
       <Field label="Billing cycle"><Select name="cycle" options={["Monthly", "Quarterly", "Yearly"]} defaultValue={s.cycle ?? "Monthly"} /></Field>
       <Field label="Next renewal"><Input type="date" name="nextRenewal" defaultValue={s.nextRenewal ?? ""} /></Field>
-      <Field label="Scope"><Select name="scope" options={SCOPES} defaultValue={s.scope ?? "Personal"} /></Field>
+      <ScopeFields scope={s.scope} business={s.business} />
       <Field label="Category"><Select name="category" options={categories} placeholder="—" defaultValue={pick(categories, s.categoryIds[0])} /></Field>
       <Field label="Payment method"><Select name="paymentMethod" options={["Credit Card", "UPI", "Debit Card", "Bank Transfer"]} placeholder="—" defaultValue={s.paymentMethod ?? ""} /></Field>
       <Field label="Notes" className="col-span-2"><Input name="notes" defaultValue={s.notes} /></Field>

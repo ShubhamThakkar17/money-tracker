@@ -70,7 +70,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/analyt
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="flex rounded-lg border border-line p-0.5 text-sm">
-            {(["all", "Personal", "Infinity Linkage"] as const).map((s) => (
+            {(["all", "Personal", "Work"] as const).map((s) => (
               <Link key={s} href={href({ period, scope: s, focus: focusParam })} className={cx("rounded-md px-2.5 py-1 whitespace-nowrap", s === scope ? "bg-surface-2 font-medium" : "text-ink-2")}>
                 {s === "all" ? "All" : s}
               </Link>

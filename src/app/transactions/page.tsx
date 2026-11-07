@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { getCategories, getDebtsAndPeople, getSubcategories, getTransactions } from "@/lib/data";
-import { parseScope } from "@/lib/config";
+import { BUSINESSES, parseScope } from "@/lib/config";
 import { formatDate, formatINR, monthKey, monthLabel, todayIST } from "@/lib/format";
 import { Badge, Card, Empty, PageHeader, cx, inputClass } from "@/components/ui";
 import { ScopeTabs } from "@/components/scope-tabs";
@@ -18,6 +18,7 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
   const scope = parseScope(sp.scope);
   const month = typeof sp.month === "string" && /^\d{4}-\d{2}$/.test(sp.month) ? sp.month : "all";
   const type = sp.type === "Income" || sp.type === "Expense" ? sp.type : "all";
+  const business = typeof sp.business === "string" && (BUSINESSES as readonly string[]).includes(sp.business) ? sp.business : "all";
 
   const [transactions, categories, subcategories, { debts, people }] = await Promise.all([getTransactions(), getCategories(), getSubcategories(), getDebtsAndPeople()]);
   const catOptions = categories.map((c) => ({ value: c.id, label: `${c.icon ? c.icon + " " : ""}${c.name}` }));
@@ -31,7 +32,8 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
     (t) =>
       (scope === "all" || t.scope === scope) &&
       (type === "all" || t.type === type) &&
-      (month === "all" || (t.date && monthKey(t.date) === month)),
+      (month === "all" || (t.date && monthKey(t.date) === month)) &&
+      (business === "all" || t.business === business),
   );
   // Transfers (card bill payments, moves between your own accounts) aren't money in or out.
   const totalIn = rows.filter((t) => t.type === "Income" && !t.transfer).reduce((s, t) => s + t.amount, 0);
@@ -72,7 +74,7 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
         <Card
           title={`${rows.length} transaction${rows.length === 1 ? "" : "s"}`}
           action={
-            <AutoSubmitForm className="flex gap-2">
+            <AutoSubmitForm className="flex flex-wrap gap-2">
               {scope !== "all" && <input type="hidden" name="scope" value={scope} />}
               <select name="month" defaultValue={month} className={cx(inputClass, "w-auto py-1.5")} aria-label="Month">
                 <option value="all">All months</option>
@@ -83,6 +85,12 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
                 <option value="Expense">Expenses</option>
                 <option value="Income">Income</option>
               </select>
+              {scope === "Work" && (
+                <select name="business" defaultValue={business} className={cx(inputClass, "w-auto py-1.5")} aria-label="Business">
+                  <option value="all">All businesses</option>
+                  {BUSINESSES.map((b) => <option key={b} value={b}>{b}</option>)}
+                </select>
+              )}
               <noscript><button className="rounded-lg border border-line px-3 text-sm hover:bg-surface-2">Filter</button></noscript>
             </AutoSubmitForm>
           }
@@ -123,7 +131,7 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
                           <span className="block text-xs text-muted">{subName.get(t.subcategoryIds[0].replaceAll("-", ""))}</span>
                         )}
                       </td>
-                      <td className="hidden py-2.5 pr-3 md:table-cell">{t.scope ? <Badge tone={t.scope === "Personal" ? "neutral" : "accent"}>{t.scope}</Badge> : "—"}</td>
+                      <td className="hidden py-2.5 pr-3 md:table-cell">{t.scope ? <Badge tone={t.scope === "Personal" ? "neutral" : "accent"}>{t.business || t.scope}</Badge> : "—"}</td>
                       <td className="hidden py-2.5 pr-3 text-ink-2 lg:table-cell">{t.paymentMethod ?? "—"}</td>
                       <td className={cx("tabular py-2.5 text-right font-medium whitespace-nowrap", t.type === "Income" && "text-good-text")}>
                         {t.type === "Income" ? "+" : "−"}{formatINR(t.amount)}
